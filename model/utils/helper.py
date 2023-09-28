@@ -16,8 +16,7 @@ def load_json_schema(file_name):
         return json.loads(schema.read())
 
 
-class ReqresResponce():
-
+class ReqresResponce:
     def responce_status_chek(self, status_code, expected_status):
         with allure.step(f'Статус ответа: {status_code}'):
             assert status_code == expected_status, f'Статус ответа {status_code}'
@@ -41,7 +40,9 @@ class CustomSession(Session):
         super().__init__()
 
     def request(self, method, url, *args, **kwargs) -> Response:
-        response = super(CustomSession, self).request(method=method, url=self.base_url + url, *args, **kwargs)
+        response = super(CustomSession, self).request(
+            method=method, url=self.base_url + url, *args, **kwargs
+        )
         status = response.status_code
         curl = to_curl(response.request)
         date_time = datetime.now()
@@ -55,17 +56,22 @@ class CustomSession(Session):
                 body=f'Время запроса: {date_time}. Код ответа: {status} {curl}. Переданы параметры *args, **kwargs: {args} {kwargs}',
                 name='info',
                 attachment_type=AttachmentType.TEXT,
-                extension='txt')
+                extension='txt',
+            )
             try:
-                allure.attach(body=json.dumps(response.json(), ensure_ascii=False, indent=2),
-                              name='response json',
-                              attachment_type=AttachmentType.JSON,
-                              extension='json')
+                allure.attach(
+                    body=json.dumps(response.json(), ensure_ascii=False, indent=2),
+                    name='response json',
+                    attachment_type=AttachmentType.JSON,
+                    extension='json',
+                )
             except json.JSONDecodeError:
-                allure.attach(body=response.text,
-                              name='response text',
-                              attachment_type=AttachmentType.TEXT,
-                              extension='txt')
+                allure.attach(
+                    body=response.text,
+                    name='response text',
+                    attachment_type=AttachmentType.TEXT,
+                    extension='txt',
+                )
 
             return response
 
